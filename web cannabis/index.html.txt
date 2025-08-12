@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Control Consumo Cannabis Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* --- CSS integrado --- */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      scroll-behavior: smooth;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      user-select: none;
+    }
+
+    header, footer {
+      background: #161b22;
+      color: #58a6ff;
+      text-align: center;
+      padding: 1em 0;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px #58a6ff;
+      width: 100%;
+      max-width: 960px;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1rem;
+      background: #161b22;
+      border-bottom: 2px solid #238636;
+      max-width: 960px;
+      width: 100%;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .tabs button {
+      background: transparent;
+      border: none;
+      color: #58a6ff;
+      font-weight: 600;
+      padding: 0.6em 1.2em;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+      flex: 1 1 auto;
+      max-width: 150px;
+      user-select: none;
+    }
+
+    .tabs button.active,
+    .tabs button:hover:not(:disabled) {
+      border-bottom-color: #58a6ff;
+      color: #79c0ff;
+      text-shadow: 0 0 8px #79c0ff;
+    }
+
+    .tabs button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Main sección */
+    main {
+      width: 100%;
+      max-width: 960px;
+      background: #161b22;
+      box-shadow: 0 0 20px #238636;
+      border-radius: 0 0 12px 12px;
+      padding: 2rem;
+      min-height: 600px;
+      color: #c9d1d9;
+      overflow-y: auto;
+    }
+
+    /* Tabs contenido */
+    main .tab {
+      display: none;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    main .tab.active {
+      display: block;
+    }
+
+    /* Formularios y listas */
+    form label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+      color: #79c0ff;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 0.5rem 0.7rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1.5px solid #238636;
+      background: #0d1117;
+      color: #c9d1d9;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    form input:focus,
+    form select:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 8px #58a6ff;
+    }
+
+    form button {
+      background: #238636;
+      color: #c9d1d9;
+      border: none;
+      padding: 0.75rem 1.2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #2ecc71;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      text-transform: uppercase;
+    }
+
+    form button:hover {
+      background: #2ecc71;
+      box-shadow: 0 0 15px #2ecc71;
+    }
+
+    /* Mensajes */
+    #loginMsg,
+    #addMsg,
+    #socialMsg {
+      margin-top: 0.4rem;
+      color: #79c0ff;
+      font-weight: 600;
+      min-height: 1.4rem;
+    }
+
+    /* Lista de registros */
+    #recordsList {
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.6rem;
+    }
+
+    .record {
+      background: #0d1117;
+      border: 1px solid #238636;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #58a6ff inset;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    /* Scroll personalizado */
+    #recordsList::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    #recordsList::-webkit-scrollbar-track {
+      background: #161b22;
+      border-radius: 10px;
+    }
+
+    #recordsList::-webkit-scrollbar-thumb {
+      background: #58a6ff;
+      border-radius: 10px;
+    }
+
+    /* Input búsqueda registros */
+    #searchRecordsInput {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem 0.7rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1.5px solid #238636;
+      background: #0d1117;
+      color: #c9d1d9;
+      box-shadow: 0 0 6px #58a6ff;
+    }
+
+    /* Contenedor de gráficos */
+    canvas {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      border-radius: 15px;
+      box-shadow:
+        0 0 8px #238636,
+        inset 0 0 15px #58a6ff;
+      max-width: 100%;
+      height: 320px !important;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Contenedor recomendaciones */
+    #recomendacionesBox {
+      background: #0d1117;
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      box-shadow: inset 0 0 10px #58a6ffcc;
+      color: #79c0ff;
+      font-size: 1rem;
+      line-height: 1.4;
+      min-height: 90px;
+      margin-top: 1rem;
+    }
+
+    /* Botón cerrar sesión */
+    #logoutBtn {
+      background-color: #c62828;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      font-weight: 700;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #c62828aa;
+      user-select: none;
+      margin-left: auto;
+      display: none;
+    }
+
+    #logoutBtn:hover {
+      background-color: #e53935;
+    }
+
+    /* Animación fadeIn */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      main {
+        padding: 1rem 1rem;
+        min-height: auto;
+      }
+      .tabs button {
+        max-width: 100%;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    CONTROL CONSUMO CANNABIS PRO
+    <button id="logoutBtn">Cerrar sesión</button>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="login-tab" class="active">Iniciar sesión</button>
+    <button data-tab="add-tab" disabled>Agregar Registro</button>
+    <button data-tab="records-tab" disabled>Historial</button>
+    <button data-tab="social-tab" disabled>Desempeño Social</button>
+    <button data-tab="recomendaciones-tab" disabled>Recomendaciones</button>
+  </nav>
+
+  <main>
+    <!-- Login -->
+    <section class="tab active" id="login-tab">
+      <h2>Iniciar sesión</h2>
+      <input id="usernameInput" placeholder="Ingresa tu usuario" />
+      <button id="loginBtn">Ingresar</button>
+      <div id="loginMsg"></div>
+    </section>
+
+    <!-- Agregar registro -->
+    <section class="tab" id="add-tab">
+      <h2>Agregar Registro de Consumo</h2>
+      <form id="addForm">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" required />
+
+        <label for="tipo">Tipo de Cannabis</label>
+        <input type="text" id="tipo" placeholder="Ej. Indica, Sativa..." required />
+
+        <label for="proveedor">Proveedor</label>
+        <input type="text" id="proveedor" placeholder="Nombre proveedor" required />
+
+        <label for="cantidad">Cantidad (gramos)</label>
+        <input type="number" id="cantidad" step="0.01" min="0" required />
+
+        <label for="precio">Precio total ($)</label>
+        <input type="number" id="precio" step="0.01" min="0" required />
+
+        <label for="motivo">Motivo</label>
+        <input type="text" id="motivo" placeholder="Ej. Medicinal, recreativo" required />
+
+        <label for="metodo">Método de consumo</label>
+        <input type="text" id="metodo" placeholder="Ej. Vaporizador, fumado" required />
+
+        <label for="satisfaccion">Satisfacción (1-10)</label>
+        <input type="number" id="satisfaccion" min="1" max="10" required />
+
+        <label for="efectos">Efectos secundarios</label>
+        <input type="text" id="efectos" placeholder="Ej. Ansiedad, sequedad..." />
+
+        <button type="submit">Agregar</button>
+      </form>
+      <div id="addMsg"></div>
+    </section>
+
+    <!-- Historial -->
+    <section class="tab" id="records-tab">
+      <h2>Historial de Registros</h2>
+      <input type="text" id="searchRecordsInput" placeholder="Buscar por tipo o proveedor..." />
+      <div id="recordsList"></div>
+    </section>
+
+    <!-- Desempeño social -->
+    <section class="tab" id="social-tab">
+      <h2>Registrar Desempeño Social</h2>
+      <form id="socialForm">
+        <label for="interaccionesSociales">Interacciones Sociales</label>
+        <select id="interaccionesSociales" required>
+          <option value="">Selecciona</option>
+          <option value="Bajo">Bajo</option>
+          <option value="Moderado">Moderado</option>
+          <option value="Alto">Alto</option>
+        </select>
+
+        <label for="desempenoLaboral">Desempeño Laboral/Estudios</label>
+        <select id="desempenoLaboral" required>
+          <option value="">Selecciona</option>
+          <option value="Bajo">Bajo</option>
+          <option value="Moderado">Moderado</option>
+          <option value="Alto">Alto</option>
+        </select>
+
+        <label for="estadoAnimo">Estado de Ánimo</label>
+        <select id="estadoAnimo" required>
+          <option value="">Selecciona</option>
+          <option value="Negativo">Negativo</option>
+          <option value="Neutral">Neutral</option>
+          <option value="Positivo">Positivo</option>
+        </select>
+
+        <button type="submit">Registrar</button>
+      </form>
+      <div id="socialMsg"></div>
+
+      <h3>Gráfico Desempeño Social</h3>
+      <canvas id="graficoSocial"></canvas>
+    </section>
+
+    <!-- Recomendaciones -->
+    <section class="tab" id="recomendaciones-tab">
+      <h2>Recomendaciones</h2>
+      <div id="recomendacionesBox"></div>
+    </section>
+  </main>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // --- JavaScript integrado ---
+
+    let registros = [];
+    let usuarioActual = null;
+
+    const tabs = document.querySelectorAll(".tabs button[data-tab]");
+    const sections = document.querySelectorAll("main .tab");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const usernameInput = document.getElementById("usernameInput");
+    const loginMsg = document.getElementById("loginMsg");
+    const addForm = document.getElementById("addForm");
+    const addMsg = document.getElementById("addMsg");
+    const recordsList = document.getElementById("recordsList");
+    const searchRecordsInput = document.getElementById("searchRecordsInput");
+    const recomendacionesBox = document.getElementById("recomendacionesBox");
+
+    // Desempeño social
+    const socialForm = document.getElementById("socialForm");
+    const socialMsg = document.getElementById("socialMsg");
+
+    // Variables para gráficos
+    let chartSatisfaccion, chartConsumoMensual, chartCostoGramo, chartMetodo, chartMotivo, chartSocial;
+
+    // --- Navegación por pestañas ---
+    tabs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        tabs.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tabId = btn.getAttribute("data-tab");
+        sections.forEach((sec) => {
+          sec.id === tabId ? sec.classList.add("active") : sec.classList.remove("active");
+        });
+      });
+    });
+
+    // --- Login ---
+    loginBtn.addEventListener("click", () => {
+      const user = usernameInput.value.trim();
+      if (!user) {
+        loginMsg.textContent = "Por favor ingresa un nombre de usuario.";
+        return;
+      }
+      usuarioActual = user;
+      loginMsg.textContent = `¡Bienvenido, ${usuarioActual}!`;
+      localStorage.setItem("usuarioActual", usuarioActual);
+      cargarDatos();
+      activarTabs(true);
+      cambiarTab("add-tab");
+      limpiarLogin();
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      usuarioActual = null;
+      localStorage.removeItem("usuarioActual");
+      registros = [];
+      activarTabs(false);
+      cambiarTab("login-tab");
+      limpiarUI();
+    });
+
+    // --- Activar o desactivar pestañas ---
+    function activarTabs(estado) {
+      tabs.forEach((btn) => {
+        if (btn.getAttribute("data-tab") !== "login-tab") btn.disabled = !estado;
+      });
+      logoutBtn.style.display = estado ? "inline-block" : "none";
+    }
+
+    // --- Cambiar pestaña activa ---
+    function cambiarTab(tabId) {
+      tabs.forEach((b) => b.classList.remove("active"));
+      sections.forEach((s) => s.classList.remove("active"));
+      const btn = Array.from(tabs).find((b) => b.getAttribute("data-tab") === tabId);
+      if (btn) btn.classList.add("active");
+      const sec = Array.from(sections).find((s) => s.id === tabId);
+      if (sec) sec.classList.add("active");
+    }
+
+    // --- Limpiar login ---
+    function limpiarLogin() {
+      usernameInput.value = "";
+      loginMsg.textContent = "";
+    }
+
+    // --- Guardar y cargar datos registros ---
+    function cargarDatos() {
+      const datos = localStorage.getItem("registros_" + usuarioActual);
+      registros = datos ? JSON.parse(datos) : [];
+      actualizarUI();
+    }
+
+    function guardarDatos() {
+      localStorage.setItem("registros_" + usuarioActual, JSON.stringify(registros));
+    }
+
+    // --- Guardar y cargar datos desempeño social ---
+    function cargarDatosSocial() {
+      const datos = localStorage.getItem("desempenoSocial_" + usuarioActual);
+      return datos ? JSON.parse(datos) : [];
+    }
+
+    function guardarDatosSocial(datos) {
+      localStorage.setItem("desempenoSocial_" + usuarioActual, JSON.stringify(datos));
+    }
+
+    // --- Actualizar UI general ---
+    function actualizarUI() {
+      mostrarRegistros();
+      inicializarGraficos();
+      mostrarRecomendaciones();
+    }
+
+    // --- Limpiar UI al cerrar sesión ---
+    function limpiarUI() {
+      registros = [];
+      recordsList.innerHTML = "";
+      recomendacionesBox.innerHTML = "";
+      limpiarFormularios();
+      if(chartSatisfaccion) chartSatisfaccion.destroy();
+      if(chartConsumoMensual) chartConsumoMensual.destroy();
+      if(chartCostoGramo) chartCostoGramo.destroy();
+      if(chartMetodo) chartMetodo.destroy();
+      if(chartMotivo) chartMotivo.destroy();
+      if(chartSocial) chartSocial.destroy();
+    }
+
+    function limpiarFormularios() {
+      addForm.reset();
+      socialForm.reset();
+      addMsg.textContent = "";
+      socialMsg.textContent = "";
+      searchRecordsInput.value = "";
+    }
+
+    // --- Agregar registro consumo ---
+    addForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!usuarioActual) {
+        addMsg.textContent = "Debes iniciar sesión primero.";
+        return;
+      }
+
+      const nuevoRegistro = {
+        fecha: addForm.fecha.value,
+        tipo: addForm.tipo.value.trim(),
+        proveedor: addForm.proveedor.value.trim(),
+        cantidad: parseFloat(addForm.cantidad.value),
+        precio: parseFloat(addForm.precio.value),
+        motivo: addForm.motivo.value.trim(),
+        metodo: addForm.metodo.value.trim(),
+        satisfaccion: parseInt(addForm.satisfaccion.value),
+        efectos: addForm.efectos.value.trim()
+      };
+
+      registros.push(nuevoRegistro);
+      guardarDatos();
+      addMsg.textContent = "Registro agregado correctamente.";
+      actualizarUI();
+      addForm.reset();
+    });
+
+    // --- Mostrar registros ---
+    function mostrarRegistros(filtro = "") {
+      let filtrados = registros;
+      if (filtro) {
+        filtro = filtro.toLowerCase();
+        filtrados = registros.filter(r =>
+          r.tipo.toLowerCase().includes(filtro) ||
+          r.proveedor.toLowerCase().includes(filtro)
+        );
+      }
+      if (filtrados.length === 0) {
+        recordsList.innerHTML = "<p>No hay registros que coincidan.</p>";
+        return;
+      }
+
+      recordsList.innerHTML = "";
+      filtrados.forEach(r => {
+        const div = document.createElement("div");
+        div.classList.add("record");
+        div.innerHTML = `
+          <strong>Fecha:</strong> ${r.fecha} <br>
+          <strong>Tipo:</strong> ${r.tipo} <br>
+          <strong>Proveedor:</strong> ${r.proveedor} <br>
+          <strong>Cantidad (g):</strong> ${r.cantidad} <br>
+          <strong>Precio ($):</strong> ${r.precio.toFixed(2)} <br>
+          <strong>Motivo:</strong> ${r.motivo} <br>
+          <strong>Método:</strong> ${r.metodo} <br>
+          <strong>Satisfacción:</strong> ${r.satisfaccion} <br>
+          <strong>Efectos:</strong> ${r.efectos || "Ninguno"}
+        `;
+        recordsList.appendChild(div);
+      });
+    }
+
+    // --- Buscar registros ---
+    searchRecordsInput.addEventListener("input", () => {
+      mostrarRegistros(searchRecordsInput.value);
+    });
+
+    // --- Desempeño social: guardar ---
+    socialForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!usuarioActual) {
+        socialMsg.textContent = "Debes iniciar sesión primero.";
+        return;
+      }
+      const interaccionesSociales = socialForm.interaccionesSociales.value;
+      const desempenoLaboral = socialForm.desempenoLaboral.value;
+      const estadoAnimo = socialForm.estadoAnimo.value;
+
+      if (!interaccionesSociales || !desempenoLaboral || !estadoAnimo) {
+        socialMsg.textContent = "Por favor, completa todos los campos.";
+        return;
+      }
+
+      let datosSocial = cargarDatosSocial();
+      datosSocial.push({
+        fecha: new Date().toISOString().split("T")[0],
+        interaccionesSociales,
+        desempenoLaboral,
+        estadoAnimo
+      });
+      guardarDatosSocial(datosSocial);
+      socialMsg.textContent = "Desempeño social registrado correctamente.";
+      socialForm.reset();
+
+      inicializarGraficos();
+    });
+
+    // --- Mostrar recomendaciones básicas ---
+    function mostrarRecomendaciones() {
+      if (!usuarioActual) {
+        recomendacionesBox.textContent = "Inicia sesión para ver recomendaciones.";
+        return;
+      }
+
+      // Ejemplo básico, se puede mejorar con análisis real
+      let recomendacion = "No hay recomendaciones disponibles.";
+      if (registros.length > 0) {
+        const ultimaSatisfaccion = registros[registros.length - 1].satisfaccion;
+        if (ultimaSatisfaccion <= 4) {
+          recomendacion = "Tu satisfacción es baja, considera cambiar tipo o método de consumo.";
+        } else if (ultimaSatisfaccion >= 8) {
+          recomendacion = "¡Estás satisfecho con tu consumo! Sigue cuidándote.";
+        } else {
+          recomendacion = "Monitorea tus efectos y ajusta según necesidad.";
+        }
+      }
+      recomendacionesBox.textContent = recomendacion;
+    }
+
+    // --- Inicializar gráficos ---
+    function inicializarGraficos() {
+      // Destruir gráficos previos
+      if (chartSatisfaccion) chartSatisfaccion.destroy();
+      if (chartConsumoMensual) chartConsumoMensual.destroy();
+      if (chartCostoGramo) chartCostoGramo.destroy();
+      if (chartMetodo) chartMetodo.destroy();
+      if (chartMotivo) chartMotivo.destroy();
+      if (chartSocial) chartSocial.destroy();
+
+      // Gráfico satisfacción
+      if (registros.length > 0) {
+        const ctxSat = document.createElement("canvas");
+        ctxSat.id = "graficoSatisfaccion";
+        // Lo ponemos temporal para construirlo, luego removemos.
+        ctxSat.style.display = "none";
+        document.body.appendChild(ctxSat);
+
+        const labels = registros.map(r => r.fecha);
+        const datosSat = registros.map(r => r.satisfaccion);
+
+        chartSatisfaccion = new Chart(ctxSat.getContext("2d"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{
+              label: "Satisfacción",
+              data: datosSat,
+              borderColor: "#2ecc71",
+              backgroundColor: "rgba(46, 204, 113, 0.2)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: 5,
+            }]
+          },
+          options: {
+            responsive: false,
+            scales: {
+              y: {
+                min: 0,
+                max: 10,
+                ticks: { stepSize: 1, color: "#fff" },
+                grid: { color: "#444" }
+              },
+              x: {
+                ticks: { color: "#fff" },
+                grid: { color: "#333" }
+              }
+            },
+            plugins: {
+              legend: { labels: { color: "#fff" } },
+              tooltip: { backgroundColor: "#000", titleColor: "#fff", bodyColor: "#fff", cornerRadius: 6, padding: 8 }
+            }
+          }
+        });
+        ctxSat.remove();
+      }
+
+      // Aquí podrías añadir más gráficos con otras métricas si quieres
+
+      // Gráfico desempeño social
+      const ctxSocial = document.getElementById("graficoSocial");
+      if (!ctxSocial) return;
+      const ctxSocialCtx = ctxSocial.getContext("2d");
+      const datosSocial = cargarDatosSocial();
+
+      if (datosSocial.length === 0) {
+        ctxSocialCtx.clearRect(0, 0, ctxSocial.width, ctxSocial.height);
+        return;
+      }
+
+      const labels = datosSocial.map(d => d.fecha);
+
+      function mapNivel(valor) {
+        switch (valor) {
+          case "Bajo": return 1;
+          case "Moderado": return 2;
+          case "Alto": return 3;
+          case "Negativo": return 1;
+          case "Neutral": return 2;
+          case "Positivo": return 3;
+          default: return 0;
+        }
+      }
+
+      const interacciones = datosSocial.map(d => mapNivel(d.interaccionesSociales));
+      const laboral = datosSocial.map(d => mapNivel(d.desempenoLaboral));
+      const animo = datosSocial.map(d => mapNivel(d.estadoAnimo));
+
+      chartSocial = new Chart(ctxSocialCtx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Interacciones Sociales",
+              data: interacciones,
+              borderColor: "#ff6384",
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: 5,
+            },
+            {
+              label: "Desempeño Laboral/Estudios",
+              data: laboral,
+              borderColor: "#36a2eb",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: 5,
+            },
+            {
+              label: "Estado de Ánimo",
+              data: animo,
+              borderColor: "#ffce56",
+              backgroundColor: "rgba(255, 206, 86, 0.2)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: 5,
+            },
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              min: 0,
+              max: 3,
+              ticks: {
+                stepSize: 1,
+                callback: function(value) {
+                  if (value === 1) return "Bajo/Negativo";
+                  if (value === 2) return "Moderado/Neutral";
+                  if (value === 3) return "Alto/Positivo";
+                  return value;
+                },
+                color: "#fff",
+              },
+              grid: {
+                color: "#444",
+              },
+            },
+            x: {
+              ticks: { color: "#fff" },
+              grid: { color: "#333" }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: "#fff" }
+            },
+            tooltip: {
+              backgroundColor: "#000",
+              titleColor: "#fff",
+              bodyColor: "#fff",
+              cornerRadius: 6,
+              padding: 8,
+            }
+          }
+        }
+      });
+    }
+
+    // --- Inicio automático ---
+    window.onload = () => {
+      usuarioActual = localStorage.getItem("usuarioActual");
+      if (usuarioActual) {
+        activarTabs(true);
+        cargarDatos();
+        cambiarTab("add-tab");
+      } else {
+        activarTabs(false);
+        cambiarTab("login-tab");
+      }
+    };
+  </script>
+</body>
+</html>
